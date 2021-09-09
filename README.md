@@ -11,9 +11,12 @@ To interpret a brainfuck program, use `./main <file>`.
 
 #### Debug file
 To interpret a file in debug mode, use `./main <file> -debug`.
+You will need to press any key to interpret the next instruction.
 ```sh
 ./main helloworld.bf -debug
 ```
+This will output the following:
+[![debugger output video](extra/debug_out_thumb.png)](https://youtu.be/E5j0Pcf_fg4)
 
 ## Compilling the interpreter
 To compile the interpreter, do `bah main.bah`.
