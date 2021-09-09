@@ -1,4 +1,10 @@
 #include "iostream.bah"
+#include "flags.bah"
+
+debug = false
+out = ""
+
+#define! getchar() char
 
 subStr(s cpstring, min int, max int) cpstring {
     ret = []char
@@ -11,9 +17,11 @@ subStr(s cpstring, min int, max int) cpstring {
 }
 
 brainFuck(ptr int*, arr []int, f cpstring, i int, l int) {
+    offset = i
+    
     for i < l {
         c = cpstringCharAt(f, i)
-
+        found = true
         if c == '>' {
             *ptr = *ptr + 1
         } else if c == '<' {
@@ -23,7 +31,11 @@ brainFuck(ptr int*, arr []int, f cpstring, i int, l int) {
         } else if c == '-' {
             arr[*ptr] = arr[*ptr] - 1
         } else if c == '.' {
-            print(charToString(<char>arr[*ptr]))
+            if debug == true {
+                out = out + charToString(<char>arr[*ptr])
+            } else {
+                print(charToString(<char>arr[*ptr]))
+            }
         } else if c == ',' {
             s = stdinput(2)
             arr[*ptr] = <int>cpstringCharAt(s, 0)
@@ -46,6 +58,65 @@ brainFuck(ptr int*, arr []int, f cpstring, i int, l int) {
             for arr[*ptr] != 0 {
                 brainFuck(ptr, arr, f, j, i)
             }
+        } else {
+            found = false
+        }
+        if found == true && debug == true {
+            realI = i
+            pos = realI
+            starts = realI
+            ends = realI
+            for starts > 0 {
+                c = cpstringCharAt(f, starts)
+                if c == <char>10 {
+                    starts = starts + 1
+                    break
+                }
+                starts = starts - 1
+            }
+            lf = strlen(f)
+            for ends < lf {
+                c = cpstringCharAt(f, ends)
+                if c == <char>10 {
+                    ends = ends - 1
+                    break
+                }
+                ends = ends + 1
+            }
+            currentLine = subStr(f, starts, ends)
+            println("\033c\033[0;0H======READER======\n"+currentLine)
+            tab = ""
+            j=0; for j < pos - starts {
+                tab = tab + " "
+                j = j + 1
+            }
+            tab = tab + "^"
+            println(tab)
+            
+            println("======BUFFER======\n")
+            buff = "["
+            indexOffset = 0
+            j=0; for j < len(arr) {
+                if j == *ptr {
+                    indexOffset = strlen(buff)
+                }
+                buff = buff + intToStr(arr[j])
+                j = j + 1
+                if j < len(arr) {
+                    buff = buff + ", "
+                }
+            }
+            buff = buff + "]"
+            println(buff)
+            tab = ""
+            j=0; for j < indexOffset {
+                tab = tab + " "
+                j = j + 1
+            }
+            tab = tab + "^"
+            println(tab)
+            println("======OUTPUT======\n"+out)
+            getchar()
         }
 
         if *ptr < 0 {
@@ -58,6 +129,12 @@ brainFuck(ptr int*, arr []int, f cpstring, i int, l int) {
 
 
 main(args []cpstring) int {
+    flags = flags{}
+    flags.addBool("debug", "Turn debug mode on.")
+    flags.parse(args)
+
+    debug = flags.isSet("debug") == 1
+
     fm = fileMap{}
     f = fm.open(args[1])
     fm.close()
