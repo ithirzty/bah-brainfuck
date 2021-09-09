@@ -1,0 +1,72 @@
+#include "iostream.bah"
+
+subStr(s cpstring, min int, max int) cpstring {
+    ret = []char
+    for min <= max {
+        c = cpstringCharAt(s, min)
+        ret[len(ret)] = c
+        min = min + 1
+    }
+    return arrAsStr(ret)
+}
+
+brainFuck(ptr int*, arr []int, f cpstring, i int, l int) {
+    for i < l {
+        c = cpstringCharAt(f, i)
+
+        if c == '>' {
+            *ptr = *ptr + 1
+        } else if c == '<' {
+            *ptr = *ptr - 1
+        } else if c == '+' {
+            arr[*ptr] = arr[*ptr] + 1
+        } else if c == '-' {
+            arr[*ptr] = arr[*ptr] - 1
+        } else if c == '.' {
+            print(charToString(<char>arr[*ptr]))
+        } else if c == ',' {
+            s = stdinput(2)
+            arr[*ptr] = <int>cpstringCharAt(s, 0)
+        } else if c == '[' {
+                nbBracks = 1
+                i = i + 1
+                j = i
+                for i < l {
+                    c = cpstringCharAt(f, i)
+                    if c == '[' {
+                        nbBracks = nbBracks + 1
+                    } else if c == ']' {
+                        nbBracks = nbBracks - 1
+                    }
+                    if nbBracks == 0 {
+                        break
+                    }
+                    i = i + 1
+                }
+            for arr[*ptr] != 0 {
+                brainFuck(ptr, arr, f, j, i)
+            }
+        }
+
+        if *ptr < 0 {
+            panic("Index cannot be less than 0.")
+        }
+
+        i = i + 1
+    }
+}
+
+
+main(args []cpstring) int {
+    fm = fileMap{}
+    f = fm.open(args[1])
+    fm.close()
+
+    ptr = 0
+    arr = []int
+
+    brainFuck(&ptr, arr, f, 0, strlen(f))
+
+
+    return 0
+}
